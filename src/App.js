@@ -10,7 +10,7 @@ function App() {
       const parsedInput = JSON.parse(jsonInput); // Validate JSON
       
       // Send the request to your backend API
-      const res = await fetch('https://bfhl-challange.vercel.app/', {
+      const res = await fetch('https://bfhl-backend-lovat.vercel.app/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: parsedInput.data }),
