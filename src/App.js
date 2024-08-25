@@ -1,55 +1,61 @@
-import React, { useState } from 'react';
+const express = require('express');
+const cors = require('cors'); // Import the CORS middleware
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-function App() {
-  const [jsonInput, setJsonInput] = useState('');
-  const [response, setResponse] = useState(null);
-  const [error, setError] = useState('');
+// Use JSON middleware
+app.use(express.json());
 
-  const handleSubmit = async () => {
-    try {
-      const parsedInput = JSON.parse(jsonInput); // Validate JSON
-      
-      // Send the request to your backend API
-      const res = await fetch('https://bfhl-backend-lovat.vercel.app/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: parsedInput.data }),
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch data');
-      }
-
-      const data = await res.json();
-      setResponse(data);
-      setError(''); // Clear any previous errors
-    } catch (err) {
-      setError('Invalid JSON format or server error');
-    }
+const corsOptions = {
+    origin: 'https://bfhl-frontend-tan.vercel.app/',  // Replace with your frontend's URL
+    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
   };
 
-  return (
-    <div style={{ padding: '20px' }}>
-      <h1>21BCE1183</h1>
-      <textarea
-        rows="5"
-        cols="50"
-        value={jsonInput}
-        onChange={(e) => setJsonInput(e.target.value)}
-        placeholder='Enter JSON here, e.g., { "data": ["A", "C", "z"] }'
-      />
-      <br />
-      <button onClick={handleSubmit}>Submit</button>
-      
-      {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
-      {response && (
-        <div style={{ marginTop: '20px' }}>
-          <h3>Response:</h3>
-          <pre>{JSON.stringify(response, null, 2)}</pre>
-        </div>
-      )}
-    </div>
-  );
-}
+app.use(cors(corsOptions));
 
-export default App;
+
+app.post('/bfhl', (req, res) => {
+    const { data } = req.body;
+    const user_id = "SARVESH KADAM_29112003";  // Update with your full name and DOB
+    const email = "sarveshdadasaheb.kadam2021@vitstudent.ac.in";
+    const roll_number = "21BCE1183";
+
+    if (!Array.isArray(data)) {
+        return res.status(400).json({ is_success: false, message: "Invalid input format" });
+    }
+
+    let numbers = [];
+    let alphabets = [];
+    let highestLowercase = null;
+
+    data.forEach(item => {
+        if (!isNaN(item)) {
+            numbers.push(item);
+        } else if (/[a-zA-Z]/.test(item)) {
+            alphabets.push(item);
+            if (/[a-z]/.test(item)) {
+                if (!highestLowercase || item > highestLowercase) {
+                    highestLowercase = item;
+                }
+            }
+        }
+    });
+
+    res.json({
+        is_success: true,
+        user_id,
+        email,
+        roll_number,
+        numbers,
+        alphabets,
+        highest_lowercase_alphabet: highestLowercase ? [highestLowercase] : []
+    });
+});
+
+// GET /bfhl endpoint
+app.get('/bfhl', (req, res) => {
+    res.json({ operation_code: 1 });
+});
+
+// Start the server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
